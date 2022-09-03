@@ -178,7 +178,7 @@ export {
   listParticipant,
   removeUsers,
   addMessage,
-  listMessage,
+  listMessages,
   removeMessage,
   editMessage,
   addStatus,
