@@ -79,13 +79,13 @@ const addMessage = async (from_, to, text, type) => {
 };
 
 /* GET messages */
-const listMessage = async (user, limit) => {
+const listMessages = async (user, limit) => {
   try {
     await mongoClient.connect();
     const db = mongoClient.db("uol-api-1");
     const messages = await db
       .collection("messages")
-      .find({$or: [{type: "message"}, {from: user}, {to: user}]})
+      .find({$or: [{type: "message"}, {type: "status"}, {from: user}, {to: user}]})
       .sort({_id: -1})
       .limit(limit)
       .toArray();
