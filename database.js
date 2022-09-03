@@ -29,7 +29,7 @@ const addParticipant = async name => {
 };
 
 /* GET participants */
-const listParticipant = async () => {
+const listParticipants = async () => {
   try {
     await mongoClient.connect();
     const db = mongoClient.db("uol-api-1");
@@ -43,7 +43,7 @@ const listParticipant = async () => {
 };
 
 /* DELETE participants */
-const removeUsers = async () => {
+const removeParticipants = async () => {
   try {
     await mongoClient.connect();
     const db = mongoClient.db("uol-api-1");
@@ -90,7 +90,7 @@ const listMessages = async (user, limit) => {
       .limit(limit)
       .toArray();
     await mongoClient.close();
-    return {data: messages, status: 200};
+    return {data: messages.reverse(), status: 200};
   } catch (error) {
     await mongoClient.close();
     return {status: 500};
@@ -175,8 +175,8 @@ const addStatus = async user => {
 
 export {
   addParticipant,
-  listParticipant,
-  removeUsers,
+  listParticipants,
+  removeParticipants,
   addMessage,
   listMessages,
   removeMessage,
