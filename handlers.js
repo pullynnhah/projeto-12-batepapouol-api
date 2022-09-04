@@ -1,13 +1,12 @@
 import {
   addParticipant,
   listParticipants,
-  removeParticipants,
   addMessage,
   listMessages,
   removeMessage,
   editMessage,
   addStatus,
-} from "database.js";
+} from "./database.js";
 
 const postParticipant = async (req, res) => {
   const {name} = req.body;
@@ -16,18 +15,13 @@ const postParticipant = async (req, res) => {
 };
 
 const getParticipants = async (req, res) => {
-  const {status, participants} = await listParticipants();
-  if (!participants) {
+  const {status, data} = await listParticipants();
+  if (!data) {
     res.sendStatus(status);
     return;
   }
 
-  res.status(status).send(participants);
-};
-
-const deleteParticipants = async (req, res) => {
-  const {status} = await removeParticipants();
-  res.sendStatus(status);
+  res.status(status).send(data);
 };
 
 const postMessage = async (req, res) => {
@@ -38,15 +32,15 @@ const postMessage = async (req, res) => {
 };
 
 const getMessages = async (req, res) => {
-  const {limit} = req.query;
+  const limit = Number(req.query.limit);
   const {user} = req.headers;
-  const {status, messages} = await listMessages(user, limit);
-  if (!messages) {
+  const {status, data} = await listMessages(user, limit);
+  if (!data) {
     res.sendStatus(status);
     return;
   }
 
-  res.status(status).send(messages);
+  res.status(status).send(data);
 };
 
 const deleteMessage = async (req, res) => {
@@ -73,7 +67,6 @@ const postStatus = async (req, res) => {
 export {
   postParticipant,
   getParticipants,
-  deleteParticipants,
   postMessage,
   getMessages,
   deleteMessage,
