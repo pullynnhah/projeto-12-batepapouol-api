@@ -7,13 +7,14 @@ import sanitaze from "./utils/sanitizer.js";
 
 dotenv.config();
 
+const DB = "uol-api";
 const mongoClient = new MongoClient(process.env.MONGO_URI);
 
 /* POST participants */
 const addParticipant = async name => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const participant = await db.collection("participants").findOne({name});
 
     if (participant) {
@@ -21,7 +22,7 @@ const addParticipant = async name => {
     }
     await db.collection("participants").insertOne({name: sanitaze(name), lastStatus: Date.now()});
     await db.collection("messages").insertOne({
-      from: name,
+      from: sanitaze(name),
       to: "Todos",
       text: "entra na sala...",
       type: "status",
@@ -40,7 +41,7 @@ const addParticipant = async name => {
 const listParticipants = async () => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const participants = await db.collection("participants").find().toArray();
     await mongoClient.close();
     return {data: participants, status: 200};
@@ -54,7 +55,7 @@ const listParticipants = async () => {
 const removeParticipants = async () => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const toRemove = await db
       .collection("participants")
       .find({lastStatus: {$lt: Date.now() - 10000}})
@@ -85,7 +86,7 @@ const removeParticipants = async () => {
 const addMessage = async (user, to, text, type) => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const participant = await db.collection("participants").findOne({name: user});
     if (!participant) {
       return {status: 422};
@@ -111,7 +112,7 @@ const addMessage = async (user, to, text, type) => {
 const listMessages = async (user, limit) => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const messages = await db
       .collection("messages")
       .find({$or: [{type: "message"}, {type: "status"}, {from: user}, {to: user}]})
@@ -130,7 +131,7 @@ const listMessages = async (user, limit) => {
 const removeMessage = async (user, id) => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const message = await db.collection("messages").findOne({_id: ObjectId(id)});
     if (!message) {
       return {status: 404};
@@ -154,7 +155,7 @@ const removeMessage = async (user, id) => {
 const editMessage = async (user, to, text, type, id) => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
 
     const message = await db.collection("messages").findOne({_id: new ObjectId(id)});
     if (!message) {
@@ -193,7 +194,7 @@ const editMessage = async (user, to, text, type, id) => {
 const addStatus = async user => {
   try {
     await mongoClient.connect();
-    const db = mongoClient.db("uol-api-1");
+    const db = mongoClient.db(DB);
     const {modifiedCount} = await db
       .collection("participants")
       .updateOne({name: user}, {$set: {lastStatus: Date.now()}});
